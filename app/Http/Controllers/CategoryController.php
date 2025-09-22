@@ -8,69 +8,101 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Display all categories
+    // Display all Categories
     public function Show()
     {
-        $categories = Category::all();
-        return response()->json($categories);
+        $data = Category::all();
+        return view('category.main', compact('data'));
+        // return response()->json([
+        //     'message' => 'Category fetch successfully',
+        //     'data' => $data
+        // ],201);
+    }
+    
+    
+    
+    // Create form Categories
+    public function Create()
+    {
+        return view('category.add');
     }
 
-    // Insert new category
+
+
+    // Insert new Category
     public function Insert(Request $request)
     {
         $request->validate([
             'name' => 'required|unique:categories,name',
         ]);
 
-        $category = Category::create([
+        $data = Category::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
         ]);
 
-        return response()->json([
-            'message' => 'Category inserted successfully',
-            'category' => $category
-        ],201);
+        return redirect()->route('category.show')
+                         ->with('success', 'Category inserted successfully.');
+
+        // return response()->json([
+        //     'message' => 'Category inserted successfully',
+        //     'data' => $data
+        // ],201);
     }
 
-    // Edit single category
+
+
+    // Edit single Category
     public function Edit($id)
     {
-        $category = Category::findOrFail($id);
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'category' => $category
-        ]);
+        $data = Category::findOrFail($id);
+
+        return view('category.edit', compact('data'));
+
+        // return response()->json([
+        //     'message' => 'Category get successfully',
+        //     'data' => $data
+        // ]);
     }
 
-    // Update category
-    public function update(Request $request, $id)
+
+
+    // Update Category
+    public function Update(Request $request, $id)
     {
-        $category = Category::findOrFail($id);
+        $data = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|unique:categories,name,' . $category->id,
+            'name' => 'required|unique:categories,name,' . $data->id,
         ]);
 
-        $category->update([
+        $data->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
         ]);
 
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'category' => $category
-        ]);
+        return redirect()->route('category.show')
+                         ->with('success', 'Category updated successfully.');
+
+        // return response()->json([
+        //     'message' => 'Category updated successfully',
+        //     'data' => $data
+        // ]);
     }
 
-    // Delete category
-    public function destroy($id)
-    {
-        $category = Category::findOrFail($id);
-        $category->delete();
 
-        return response()->json([
-            'message' => 'Category deleted successfully'
-        ]);
+
+    // Delete Category
+    public function Delete($id)
+    {
+        $data = Category::findOrFail($id);
+        $data->delete();
+
+        return redirect()->route('category.show')
+                         ->with('success', 'Category deleted successfully.');
+
+        // return response()->json([
+        //     'message' => 'Category deleted successfully'
+        // ]);
     }
 }
